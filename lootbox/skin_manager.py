@@ -65,21 +65,24 @@ class SkinManager:
         min_price: float = 2.0,
         max_price: float = 1000.0,
         order: str = "asc",
-        name_contains: str = None
+        name_contains: str = None,
+        limit: int = 50,
+        offset: int = 0
     ) -> list:
         """
         Retrieves skins within a specified price range, optionally filtering by a keyword in the name,
-        and sorted in ascending or descending order.
-        Defaults to a minimum price of 10, a maximum price of 1000, and ascending order.
+        sorted in ascending or descending order, with pagination.
 
         Args:
-            min_price (float, optional): The minimum price of the skins. Defaults to 10.0.
+            min_price (float, optional): The minimum price of the skins. Defaults to 2.0.
             max_price (float, optional): The maximum price of the skins. Defaults to 1000.0.
             order (str, optional): The sorting order, either 'asc' for ascending or 'desc' for descending. Defaults to 'asc'.
             name_contains (str, optional): A keyword to filter skins by name. Defaults to None.
+            limit (int, optional): Number of results to return. Defaults to 50.
+            offset (int, optional): Number of results to skip. Defaults to 0.
 
         Returns:
-            list: A list of skins as dictionaries within the specified price range, filtered by name, and sorted by price.
+            list: A paginated list of skins as dictionaries.
 
         Raises:
             ValueError: If invalid arguments are provided or if an error occurs during execution.
@@ -90,6 +93,11 @@ class SkinManager:
 
             if max_price < min_price:
                 raise ValueError(f"max_price ({max_price}) cannot be less than min_price ({min_price}).")
+
+            if limit <= 0:
+                raise ValueError("Limit must be greater than 0.")
+            if offset < 0:
+                raise ValueError("Offset cannot be negative.")
 
             desc = True if order == "desc" else False
 
@@ -105,14 +113,11 @@ class SkinManager:
             if name_contains:
                 query = query.ilike("name", f"%{name_contains}%")
 
-            query = query.order("base_price", desc=desc)
+            query = query.order("base_price", desc=desc).range(offset, offset + limit - 1)
 
             response = query.execute()
 
-            if response.data:
-                return response.data
-
-            return []
+            return response.data if response.data else []
 
         except ValueError as ve:
             raise ValueError(f"Value error: {ve}")
