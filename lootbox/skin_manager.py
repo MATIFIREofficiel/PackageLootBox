@@ -7,9 +7,13 @@ class SkinManager:
         """
         self.supabase_client_service_role = Supabase().get_client()
 
-    def get_all_skins(self) -> list:
+    def get_all_skins(self, limit=500, offset=0) -> list:
         """
-        Retrieves all skins with full information.
+        Retrieves a paginated list of skins.
+
+        Args:
+            limit (int): Number of skins to return (default 500).
+            offset (int): Number of skins to skip before starting the result (default 0).
 
         Returns:
             list: A list of skins as dictionaries.
@@ -22,13 +26,13 @@ class SkinManager:
                 self.supabase_client_service_role
                 .table("skins_reference")
                 .select("*")
+                .range(offset, offset + limit - 1)
                 .execute()
             )
-
             return response.data if response.data else []
-
         except Exception as e:
             raise ValueError(f"An error occurred while retrieving skins: {e}")
+
 
     def get_available_skins(self) -> list:
         """
