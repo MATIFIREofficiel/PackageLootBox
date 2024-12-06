@@ -22,6 +22,11 @@ class SkinManager:
             ValueError: If an error occurs while retrieving skins.
         """
         try:
+            if limit <= 0:
+                raise ValueError("Limit must be greater than 0.")
+            if offset < 0:
+                raise ValueError("Offset cannot be negative.")
+
             response = (
                 self.supabase_client_service_role
                 .table("skins_reference")
