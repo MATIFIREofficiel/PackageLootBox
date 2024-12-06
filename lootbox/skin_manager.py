@@ -39,9 +39,13 @@ class SkinManager:
             raise ValueError(f"An error occurred while retrieving skins: {e}")
 
 
-    def get_available_skins(self) -> list:
+    def get_available_skins(self, limit=500, offset=0) -> list:
         """
         Retrieves all available skins with full information.
+
+        Args:
+            limit (int): Number of skins to return (default 500).
+            offset (int): Number of skins to skip before starting the result (default 0).
 
         Returns:
             list: A list of available skins as dictionaries.
@@ -50,11 +54,17 @@ class SkinManager:
             ValueError: If an error occurs while retrieving available skins.
         """
         try:
+            if limit <= 0:
+                raise ValueError("Limit must be greater than 0.")
+            if offset < 0:
+                raise ValueError("Offset cannot be negative.")
+
             response = (
                 self.supabase_client_service_role
                 .table("skins_reference")
                 .select("*")
                 .eq("available", True)
+                .range(offset, offset + limit - 1)
                 .execute()
             )
             if response.data:
