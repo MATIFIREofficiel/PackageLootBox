@@ -81,7 +81,7 @@ class SkinManager:
         max_price: float = 1000.0,
         order: str = "asc",
         name_contains: str = None,
-        limit: int = 50,
+        limit: int = 500,
         offset: int = 0
     ) -> list:
         """
@@ -93,8 +93,8 @@ class SkinManager:
             max_price (float, optional): The maximum price of the skins. Defaults to 1000.0.
             order (str, optional): The sorting order, either 'asc' for ascending or 'desc' for descending. Defaults to 'asc'.
             name_contains (str, optional): A keyword to filter skins by name. Defaults to None.
-            limit (int, optional): Number of results to return. Defaults to 50.
-            offset (int, optional): Number of results to skip. Defaults to 0.
+            limit (int): Number of skins to return (default 500).
+            offset (int): Number of skins to skip before starting the result (default 0).
 
         Returns:
             list: A paginated list of skins as dictionaries.
