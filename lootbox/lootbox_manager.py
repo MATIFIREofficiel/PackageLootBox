@@ -10,6 +10,37 @@ class LootboxManager:
         self.supabase_client_service_role = Supabase().get_client()
         self.skin_manager = SkinManager()
 
+    def get_all_lootbox(self, limit=500, offset=0) -> list:
+        """
+        Retrieves a paginated list of lootbox.
+
+        Args:
+            limit (int): Number of lootbox to return (default 500).
+            offset (int): Number of lootbox to skip before starting the result (default 0).
+
+        Returns:
+            list: A list of lootbox as dictionaries.
+
+        Raises:
+            ValueError: If an error occurs while retrieving lootbox.
+        """
+        try:
+            if limit <= 0:
+                raise ValueError("Limit must be greater than 0.")
+            if offset < 0:
+                raise ValueError("Offset cannot be negative.")
+
+            response = (
+                self.supabase_client_service_role
+                .table("lootbox_reference")
+                .select("*")
+                .range(offset, offset + limit - 1)
+                .execute()
+            )
+            return response.data if response.data else []
+        except Exception as e:
+            raise ValueError(f"An error occurred while retrieving lootbox: {e}")
+
     def get_lootbox_id_by_name(self, lootbox_name: str) -> int:
         """
         Retrieves the ID of a lootbox by its name.
